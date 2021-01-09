@@ -1,28 +1,10 @@
-import React from "react";
-import logo from "./logo.svg";
-import "./App.css";
-import AcUnitIcon from "@material-ui/icons/AcUnit";
+import React, { ReactElement } from 'react';
+import 'normalize.css';
+import './app.css';
+import ModuleRouter from './modules/_router';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <AcUnitIcon />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+const App = (): ReactElement => {
+  return <ModuleRouter />;
+};
 
 export default App;
