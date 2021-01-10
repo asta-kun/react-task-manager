@@ -19,6 +19,15 @@ export interface PayloadCreate {
   maxTime: number; // milliseconds
 }
 
+export interface PayloadUpdate {
+  status?: number;
+  description?: string | null;
+  maxTime?: number; // milliseconds
+  weight?: number;
+}
+
 export interface Actions {
-  create: (PayloadCreate: Payload) => Promise<string>; // returns id
+  create: (state: PayloadCreate) => Promise<string>; // returns id
+  update: (taskId: string, state: PayloadUpdate) => Promise<void>; // throw error
+  remove: (taskId: string) => Promise<void>; // throw error
 }

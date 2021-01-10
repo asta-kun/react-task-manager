@@ -1,7 +1,6 @@
 import { useCallback } from 'react';
 import useSWR, { mutate as globalMutation } from 'swr';
-import { Actions, initialData, PayloadCreate, Response } from './response.d';
-import { isEmpty } from 'lodash';
+import { Actions, initialData, PayloadCreate, PayloadUpdate, Response } from './response.d';
 import { Task, TaskStatus } from '../../../request-type/tasks.d';
 import { nanoid } from 'nanoid';
 import moment, { Moment } from 'moment';
@@ -30,18 +29,18 @@ export const useTasks = (date: Moment): Response => {
         state.data[task.id] = task;
         return state;
       },
-      { ...initialData, loading: false },
+      { tasks: [], data: {}, loading: false } as Response,
     );
 
     return data;
   }, []);
 
-  const { data } = useSWR((!isEmpty(date) && END_POINT_LIST) || null, () => fetcher(date), {
+  const { data } = useSWR(END_POINT_LIST, () => fetcher(date), {
     initialData,
     revalidateOnMount: true,
     revalidateOnFocus: false,
     refreshInterval: 1000 * 30,
-    dedupingInterval: 1000 * 3,
+    dedupingInterval: 1000 * 5,
   });
 
   return data as Response;
@@ -54,9 +53,9 @@ export const useTaskActions = (): Actions => {
     const tasks = getAllTask(startDate, endDate);
     const weight =
       tasks.reduce((state, task) => {
-        if (task.weight > state) return task.weight;
+        if (task.weight < state) return task.weight;
         return state;
-      }, 0) + 100;
+      }, 0) - 1;
 
     // apply defaults
     const { description = '', status = TaskStatus.pending, maxTime = 1000 * 60 * 30 } = rawPayload;
@@ -79,5 +78,25 @@ export const useTaskActions = (): Actions => {
     return newTask.id;
   }, []);
 
-  return { create };
+  const update = useCallback(async (taskId: string, rawPayload: PayloadUpdate) => {
+    const rawTask: string = window.localStorage.getItem(taskId) || '';
+    if (!rawTask) throw new Error();
+    const task = JSON.parse(rawTask) as Task;
+
+    // overwrite fields
+    const updatedTask: Task = {
+      ...task,
+      ...rawPayload,
+    };
+
+    window.localStorage.setItem(updatedTask.id, JSON.stringify(updatedTask));
+    mutateList();
+  }, []);
+
+  const remove = useCallback(async (taskId: string) => {
+    window.localStorage.removeItem(taskId);
+    mutateList();
+  }, []);
+
+  return { create, update, remove };
 };

@@ -64,19 +64,19 @@ const TastCreate = ({ open, onClose }: TastCreateProps): ReactElement => {
 
     create(state)
       .then(() => {
-        addToast('Task updated successfully.', {
+        addToast('Task added successfully.', {
           appearance: 'success',
           autoDismiss: true,
         });
         onClose();
       })
-      .catch(() =>
+      .catch(() => {
         addToast('Error creating Task.', {
           appearance: 'error',
           autoDismiss: true,
-        }),
-      )
-      .finally(() => setLoading(false));
+        });
+        setLoading(false);
+      });
   };
 
   const handleChangeCustomTime = (e: ChangeEvent<HTMLInputElement>) => {
@@ -120,6 +120,7 @@ const TastCreate = ({ open, onClose }: TastCreateProps): ReactElement => {
     setState({
       ...initialState,
     });
+    setLoading(false);
   }, [open]);
 
   useEffect(() => {
