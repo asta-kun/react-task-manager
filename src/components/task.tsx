@@ -1,20 +1,15 @@
 import React, { ChangeEvent, ReactElement, useEffect, useState } from 'react';
 import { FormControl, InputLabel, Select, MenuItem, TextField, Grid, InputAdornment, Button } from '@material-ui/core';
-import TrackChangesIcon from '@material-ui/icons/TrackChanges';
 import SaveIcon from '@material-ui/icons/Save';
-import _ from 'lodash';
-// import { useKartsActions } from '../../../api/karts';
-// import { useToasts } from 'react-toast-notifications';
-// import { useTracks } from '../management/tracks';
+import { cloneDeep, isEmpty } from 'lodash';
 import { useToasts } from 'react-toast-notifications';
-// import Alert from '@material-ui/lab/Alert';
 import Portal from '../containers/portal';
 import { PayloadCreate } from '../api/tasks/list/response';
 import { TaskStatus } from '../request-type/tasks.d';
 import AccessTimeIcon from '@material-ui/icons/AccessTime';
 import moment from 'moment';
 import Alert from '@material-ui/lab/Alert';
-import useStyles from './task-create.style';
+import useStyles from './task.style';
 import { useTaskActions } from '../api/tasks/list';
 
 const initialState: PayloadCreate = {
@@ -45,14 +40,19 @@ const CustomError = ({ kind }: CustomErrorProps): ReactElement => {
   );
 };
 
-type TastCreateProps = {
+export type State = PayloadCreate & {
+  id?: string | null;
+};
+
+type TaskCreateProps = {
   open: boolean;
   onClose: () => void;
+  task?: State;
 };
-const TastCreate = ({ open, onClose }: TastCreateProps): ReactElement => {
-  const { create } = useTaskActions();
+const TaskEditor = ({ open, onClose, task }: TaskCreateProps): ReactElement => {
+  const { create, update } = useTaskActions();
   const { addToast } = useToasts();
-  const [state, setState] = useState<PayloadCreate>({ ...initialState });
+  const [state, setState] = useState<State>({ ...initialState, ...task });
   const [disabled, setDisabled] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [timeAux, setTimeAux] = useState<number>(0);
@@ -61,19 +61,16 @@ const TastCreate = ({ open, onClose }: TastCreateProps): ReactElement => {
 
   const handleSave = () => {
     setLoading(true);
+    const payload = cloneDeep(state);
 
-    create(state)
-      .then(() => {
-        addToast('Task added successfully.', {
-          appearance: 'success',
-          autoDismiss: true,
-        });
-        onClose();
-      })
+    const isUpdate = !isEmpty(payload?.id);
+    isUpdate && delete payload.id;
+
+    ((isUpdate ? update(state?.id as string, state) : create(payload)) as Promise<void>)
+      .then(() => onClose())
       .catch(() => {
-        addToast('Error creating Task.', {
+        addToast(`Error  ${state?.id ? 'updating' : 'creating'} Task.`, {
           appearance: 'error',
-          autoDismiss: true,
         });
         setLoading(false);
       });
@@ -117,13 +114,6 @@ const TastCreate = ({ open, onClose }: TastCreateProps): ReactElement => {
   };
 
   useEffect(() => {
-    setState({
-      ...initialState,
-    });
-    setLoading(false);
-  }, [open]);
-
-  useEffect(() => {
     const date = moment()
       .set({ hour: 0, minute: 0, millisecond: 0 })
       .add(timeAux || state.maxTime, 'ms')
@@ -135,9 +125,21 @@ const TastCreate = ({ open, onClose }: TastCreateProps): ReactElement => {
     setDisabled(errorKind !== null);
   }, [errorKind]);
 
+  useEffect(() => {
+    setState({ ...initialState, ...task });
+  }, [task]);
+
+  useEffect(() => {
+    !open &&
+      setState({
+        ...initialState,
+      });
+    setLoading(false);
+  }, [open]);
+
   return (
     <Portal
-      title="Add new task"
+      title={(state?.id && `Edit task`) || 'Add new task'}
       open={open}
       fullHeight={false}
       fullScreen={false}
@@ -263,4 +265,4 @@ const TastCreate = ({ open, onClose }: TastCreateProps): ReactElement => {
   );
 };
 
-export default TastCreate;
+export default TaskEditor;

@@ -1,6 +1,5 @@
 import { Box, Grid, IconButton } from '@material-ui/core';
-import moment from 'moment';
-import React, { ReactElement, ReactNode, RefObject, useCallback } from 'react';
+import React, { ReactElement, ReactNode, useCallback } from 'react';
 import { Task } from '../../../request-type/tasks';
 import useStyles from './task-list.item.style';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
@@ -8,6 +7,7 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import DeleteIcon from '@material-ui/icons/Delete';
 import StopIcon from '@material-ui/icons/Stop';
 import { useTaskActions } from '../../../api/tasks/list';
+import { useTaskManager } from '../../../management/task-manager';
 
 type TaskListItemProps = {
   task: Task;
@@ -17,8 +17,10 @@ type TaskListItemProps = {
 const TaskListItem = ({ task, draggable }: TaskListItemProps): ReactElement => {
   const classes = useStyles();
   const { remove } = useTaskActions();
+  const { selectTask } = useTaskManager();
 
   const handleRemove = useCallback(() => remove(task.id), [task, remove]);
+  const handleSelect = useCallback(() => selectTask(task.id), [task, selectTask]);
 
   return (
     <Grid container className={classes.root} justify="space-evenly" alignItems="center">
@@ -46,7 +48,7 @@ const TaskListItem = ({ task, draggable }: TaskListItemProps): ReactElement => {
             </IconButton>
           </Grid>
           <Grid item xs={3}>
-            <IconButton size="small">
+            <IconButton size="small" onClick={handleSelect}>
               <SettingsIcon />
             </IconButton>
           </Grid>

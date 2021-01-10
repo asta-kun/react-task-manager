@@ -1,8 +1,15 @@
 import moment from 'moment';
 import React, { ReactElement, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTaskActions, useTasks } from '../../api/tasks/list';
-import TaskCreate from '../../components/task-create';
+import Task, { State } from '../../components/task';
 import { TaskManagerContext } from './context';
+
+const initialStateSelectedTask = {
+  description: null,
+  id: null,
+  status: 0,
+  maxTime: 1000 * 60 * 30,
+};
 
 type TaskManagerContextProps = {
   children: ReactNode;
@@ -13,10 +20,21 @@ const TaskManagerContextProvider = ({ children }: TaskManagerContextProps): Reac
   const { tasks, data } = useTasks(moment());
   const sortedTask = useMemo(() => tasks.sort((a, b) => data[a].weight - data[b].weight), [data, tasks]);
 
-  const [openCreateNew, setOpenCreateNew] = useState<boolean>(false);
+  const [openTaskEditor, setOpenTaskEditor] = useState<boolean>(false);
 
-  // open modal to create new tasks
-  const handleToggleCreateNew = useCallback(() => setOpenCreateNew(!openCreateNew), [openCreateNew]);
+  const [selectedTask, setSelectedTask] = useState<string | null>(null);
+  const [selectedTaskState, setSelectedTaskState] = useState<State>({
+    ...initialStateSelectedTask,
+  });
+
+  const handleSelectTask = useCallback((taskId: string) => setSelectedTask(taskId), [setSelectedTask]);
+
+  // open modal to create/update tasks
+  const handleToggleTaskEditor = useCallback(() => {
+    openTaskEditor && setSelectedTask(null);
+
+    setOpenTaskEditor(!openTaskEditor);
+  }, [openTaskEditor]);
 
   // change positions
   const handleChangePosition = useCallback(
@@ -39,12 +57,27 @@ const TaskManagerContextProvider = ({ children }: TaskManagerContextProps): Reac
     [sortedTask],
   );
 
+  useEffect(() => {
+    if (selectedTask) {
+      setSelectedTaskState({ ...data[selectedTask] });
+      setOpenTaskEditor(true);
+    } else {
+      setSelectedTaskState({ ...initialStateSelectedTask });
+    }
+  }, [selectedTask]);
+
   return (
     <TaskManagerContext.Provider
-      value={{ create: handleToggleCreateNew, changePosition: handleChangePosition, sortedTask, tasks: data }}
+      value={{
+        create: handleToggleTaskEditor,
+        changePosition: handleChangePosition,
+        sortedTask,
+        tasks: data,
+        selectTask: handleSelectTask,
+      }}
     >
       {children}
-      <TaskCreate open={openCreateNew} onClose={handleToggleCreateNew} />
+      <Task open={openTaskEditor} onClose={handleToggleTaskEditor} task={selectedTaskState} />
     </TaskManagerContext.Provider>
   );
 };
