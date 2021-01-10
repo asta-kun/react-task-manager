@@ -5,6 +5,7 @@
   "dependencies": {
     "@material-ui/core": "^4.11.2",
     "@material-ui/icons": "^4.11.2",
+    "@material-ui/lab": "^4.0.0-alpha.57",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
@@ -18,11 +19,13 @@
     "gsap": "^3.5.1",
     "lodash": "^4.17.20",
     "moment": "^2.29.1",
+    "nanoid": "^3.1.20",
     "normalize.css": "^8.0.1",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.1",
+    "react-toast-notifications": "^2.4.0",
     "swr": "^0.4.0",
     "typescript": "^4.0.3",
     "web-vitals": "^0.2.4"
@@ -53,6 +56,7 @@
   },
   "devDependencies": {
     "@types/gsap": "^1.20.2",
-    "@types/material-ui": "^0.21.8"
+    "@types/material-ui": "^0.21.8",
+    "@types/react-toast-notifications": "^2.4.0"
   }
 }
