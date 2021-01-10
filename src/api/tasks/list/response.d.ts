@@ -13,13 +13,12 @@ export const initialData: Response = {
   loading: true,
 };
 
-export interface Payload {
-  status?: number;
-  notes?: string;
-  transponder?: string;
-  track_id?: number;
+export interface PayloadCreate {
+  status: number;
+  description: string | null;
+  maxTime: number; // milliseconds
 }
 
 export interface Actions {
-  update: (taskId: number, payload: Payload) => Promise<void>;
+  create: (PayloadCreate: Payload) => Promise<string>; // returns id
 }

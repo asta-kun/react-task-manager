@@ -2,11 +2,11 @@ export interface Task {
   id: string;
   status: number;
   weight: number;
-  description: string;
+  description: string | null;
   maxTime: number; // milliseconds
   timeElapsed: number; // milliseconds
   createdAt: string;
-  finishedAt: string;
+  finishedAt: string | null;
 }
 
 export enum TaskStatus {

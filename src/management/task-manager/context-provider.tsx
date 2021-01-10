@@ -1,4 +1,5 @@
-import React, { ReactElement, ReactNode } from 'react';
+import React, { ReactElement, ReactNode, useState } from 'react';
+import TaskCreate from '../../components/task-create';
 import { TaskManagerContext } from './context';
 
 type TaskManagerContextProps = {
@@ -6,7 +7,16 @@ type TaskManagerContextProps = {
 };
 
 const TaskManagerContextProvider = ({ children }: TaskManagerContextProps): ReactElement => {
-  return <TaskManagerContext.Provider value={{}}>{children}</TaskManagerContext.Provider>;
+  const [openCreateNew, setOpenCreateNew] = useState<boolean>(false);
+
+  const handleToggleCreateNew = () => setOpenCreateNew(!openCreateNew);
+
+  return (
+    <TaskManagerContext.Provider value={{ create: handleToggleCreateNew }}>
+      {children}
+      <TaskCreate open={openCreateNew} onClose={handleToggleCreateNew} />
+    </TaskManagerContext.Provider>
+  );
 };
 
 export default TaskManagerContextProvider;

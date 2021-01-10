@@ -1,20 +1,27 @@
 import { useCallback } from 'react';
 import useSWR, { mutate as globalMutation } from 'swr';
-import { Actions, initialData, Payload, Response } from './response.d';
+import { Actions, initialData, PayloadCreate, Response } from './response.d';
 import { isEmpty } from 'lodash';
-import { Task } from '../../../request-type/tasks';
+import { Task, TaskStatus } from '../../../request-type/tasks.d';
+import { nanoid } from 'nanoid';
 import moment, { Moment } from 'moment';
+
 const BASE_END_POINT = '/process.api/karts';
 const END_POINT_LIST = `${BASE_END_POINT}/list`;
+
 export const mutateList = async () => globalMutation(END_POINT_LIST);
+
+const getAllTask = (startDate: Moment, endDate: Moment) =>
+  Object.values(window.localStorage)
+    .map((task: string) => JSON.parse(task) as Task)
+    .filter((task) => moment(task.createdAt).isSameOrAfter(startDate) && moment(task.createdAt).isBefore(endDate));
 
 export const useTasks = (date: Moment): Response => {
   // date + 1 week
   const fetcher = useCallback(async (date: Moment): Promise<Response> => {
-    const endRange = date.clone().add(7, 'd');
-    const tasks = Object.values(localStorage)
-      .map((task: Task) => task)
-      .filter((task) => moment(task.createdAt).isSameOrAfter(date) && moment(task.createdAt).isBefore(endRange));
+    const startDate = date.clone().set({ day: 0, hour: 0, minute: 0, second: 0 });
+    const endDate = startDate.clone().add(7, 'd');
+    const tasks = getAllTask(startDate, endDate);
 
     // generate friendly map
     const data = tasks.reduce(
@@ -40,17 +47,37 @@ export const useTasks = (date: Moment): Response => {
   return data as Response;
 };
 
-// export const useKartsActions = (): Actions => {
-//   const axios = useAxios();
+export const useTaskActions = (): Actions => {
+  const create = useCallback(async (rawPayload: PayloadCreate) => {
+    const startDate = moment().set({ day: 0, hour: 0, minute: 0, second: 0 });
+    const endDate = startDate.clone().add(7, 'd');
+    const tasks = getAllTask(startDate, endDate);
+    const weight =
+      tasks.reduce((state, task) => {
+        if (task.weight > state) return task.weight;
+        return state;
+      }, 0) + 100;
 
-//   const update = useCallback(
-//     async (kartId: number, payload: Payload) => {
-//       const url = `${BASE_END_POINT}/${kartId}`;
-//       await axios.put(url, payload);
-//       mutateList();
-//     },
-//     [axios]
-//   );
+    // apply defaults
+    const { description = '', status = TaskStatus.pending, maxTime = 1000 * 60 * 30 } = rawPayload;
 
-//   return { update };
-// };
+    const newTask: Task = {
+      id: nanoid(),
+      description,
+      status,
+      maxTime,
+      weight,
+      timeElapsed: 0,
+      createdAt: moment().toISOString(),
+      finishedAt: null,
+    };
+
+    window.localStorage.setItem(newTask.id, JSON.stringify(newTask));
+
+    mutateList();
+
+    return newTask.id;
+  }, []);
+
+  return { create };
+};
