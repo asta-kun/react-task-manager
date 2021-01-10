@@ -10,14 +10,11 @@ const Header = (): ReactElement => {
       <Grid container justify="space-between" alignItems="center" className={classes.root}>
         <Grid item className={classes.left} xs={4}>
           <Grid container alignItems="center">
-            <Grid item>
-              <span>
-                <AccessAlarmIcon fontSize="large" />
-              </span>
-            </Grid>
-            <Grid item>
-              <h1 className={classes.h1}>Task Manager</h1>
-            </Grid>
+            <span>
+              <AccessAlarmIcon fontSize="large" />
+            </span>
+
+            <h1 className={classes.h1}>Task Manager</h1>
           </Grid>
         </Grid>
         <Grid item xs={2}>
