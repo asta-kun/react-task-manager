@@ -4,6 +4,7 @@ import useStyles from './main.style';
 import Timer from '../components/timer';
 import TasksList from '../components/tasks-list';
 import Stats from '../components/stats';
+import { TaskStatus } from '../../../request-type/tasks.d';
 
 const MainContainer = (): ReactElement => {
   const classes = useStyles();
@@ -13,10 +14,17 @@ const MainContainer = (): ReactElement => {
         <Grid item xs={7}>
           <Timer />
           <br />
-          <TasksList />
+          <TasksList
+            showStatus={[TaskStatus.running, TaskStatus.paused, TaskStatus.pending]}
+            itemProps={{ showStatus: true, showControls: true }}
+          />
         </Grid>
         <Grid item xs={4}>
           <Stats />
+          <TasksList
+            showStatus={[TaskStatus.completed]}
+            itemProps={{ draggable: false, showStatus: true, showControls: true }}
+          />
         </Grid>
       </Grid>
     </Box>
