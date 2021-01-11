@@ -24,6 +24,7 @@ export interface PayloadUpdate {
   description?: string | null;
   maxTime?: number; // milliseconds
   weight?: number;
+  timeElapsed?: number; // milliseconds
 }
 
 export interface Actions {
