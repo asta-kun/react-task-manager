@@ -8,10 +8,19 @@ const useStyles = makeStyles(() => ({
     height: '3.5em',
     background: '#fff',
     borderRadius: 3,
+    padding: '0 1em',
+    willChange: 'transform',
+    transition: 'transform .5s',
+    '&:hover': {
+      transform: 'scale(1.025)',
+    },
   },
   description: {
     fontSize: '.9em',
     color: '#949494',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
   },
   status: {
     '& span': {
