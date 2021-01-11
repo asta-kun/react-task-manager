@@ -3,6 +3,7 @@ import { Box, Grid } from '@material-ui/core';
 import useStyles from './main.style';
 import Timer from '../components/timer';
 import TasksList from '../components/tasks-list';
+import Stats from '../components/stats';
 
 const MainContainer = (): ReactElement => {
   const classes = useStyles();
@@ -15,7 +16,7 @@ const MainContainer = (): ReactElement => {
           <TasksList />
         </Grid>
         <Grid item xs={4}>
-          x
+          <Stats />
         </Grid>
       </Grid>
     </Box>
