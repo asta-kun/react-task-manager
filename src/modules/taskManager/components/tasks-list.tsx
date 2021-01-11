@@ -3,10 +3,11 @@ import React, { ReactElement, useCallback, useEffect, useState } from 'react';
 import TaskListItem from './tasks-list.item';
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
 import { useTaskManager } from '../../../management/task-manager';
-import { Task } from '../../../request-type/tasks.d';
+import { Task, TaskStatus } from '../../../request-type/tasks.d';
 import { isEmpty } from 'lodash';
 import useStyles from './task-list.style';
 import DragIndicatorIcon from '@material-ui/icons/DragIndicator';
+import StarBorderIcon from '@material-ui/icons/StarBorder';
 
 type State = {
   [taskId: string]: Task;
@@ -42,9 +43,15 @@ const TasksList = (): ReactElement => {
                 <TaskListItem
                   task={state[taskId]}
                   draggable={
-                    <IconButton {...provided.dragHandleProps}>
-                      <DragIndicatorIcon />
-                    </IconButton>
+                    (state[taskId].status !== TaskStatus.running && (
+                      <IconButton {...provided.dragHandleProps}>
+                        <DragIndicatorIcon />
+                      </IconButton>
+                    )) || (
+                      <IconButton disabled>
+                        <StarBorderIcon />
+                      </IconButton>
+                    )
                   }
                 />
               </div>
