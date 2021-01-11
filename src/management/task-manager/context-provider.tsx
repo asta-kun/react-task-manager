@@ -2,6 +2,7 @@ import moment from 'moment';
 import React, { ReactElement, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTaskActions, useTasks } from '../../api/tasks/list';
 import Task, { State } from '../../components/task';
+import { TaskStatus } from '../../request-type/tasks.d';
 import { TaskManagerContext } from './context';
 
 const initialStateSelectedTask = {
@@ -10,6 +11,8 @@ const initialStateSelectedTask = {
   status: 0,
   maxTime: 1000 * 60 * 30,
 };
+const defaultFormat = 'HH:mm:ss';
+const initialStateCountdown = '00:00:00';
 
 type TaskManagerContextProps = {
   children: ReactNode;
@@ -18,10 +21,10 @@ type TaskManagerContextProps = {
 const TaskManagerContextProvider = ({ children }: TaskManagerContextProps): ReactElement => {
   const { update } = useTaskActions();
   const { tasks, data } = useTasks(moment());
+  const [runningTaskId, setRunningTaskId] = useState<string | null>(null);
   const sortedTask = useMemo(() => tasks.sort((a, b) => data[a].weight - data[b].weight), [data, tasks]);
-
   const [openTaskEditor, setOpenTaskEditor] = useState<boolean>(false);
-
+  const [countdown, setCountdown] = useState<string>(initialStateCountdown);
   const [selectedTask, setSelectedTask] = useState<string | null>(null);
   const [selectedTaskState, setSelectedTaskState] = useState<State>({
     ...initialStateSelectedTask,
@@ -43,7 +46,7 @@ const TaskManagerContextProvider = ({ children }: TaskManagerContextProps): Reac
       let newSorted = [...sortedTask];
       const taskId = sortedTask[source];
       newSorted[source] = '';
-      newSorted.splice(destination + upDown, 0, taskId);
+      newSorted.splice(destination + upDown + (runningTaskId && taskId !== runningTaskId ? 1 : 0), 0, taskId);
       newSorted = newSorted.filter((item) => item);
 
       Promise.all(
@@ -54,7 +57,18 @@ const TaskManagerContextProvider = ({ children }: TaskManagerContextProps): Reac
         }),
       );
     },
-    [sortedTask],
+    [sortedTask, runningTaskId],
+  );
+
+  // add elapsed time to runningTask
+  const handleAddElapsedTime = useCallback(
+    (elapsedMS: number) => {
+      runningTaskId &&
+        update(runningTaskId, {
+          timeElapsed: elapsedMS,
+        });
+    },
+    [runningTaskId, update, data],
   );
 
   useEffect(() => {
@@ -66,6 +80,54 @@ const TaskManagerContextProvider = ({ children }: TaskManagerContextProps): Reac
     }
   }, [selectedTask]);
 
+  useEffect(() => {
+    const runningTask = tasks.find((taskId) => data[taskId].status === TaskStatus.running);
+    setRunningTaskId(runningTask || null);
+  }, [tasks, data]);
+
+  useEffect(() => {
+    if (runningTaskId && data[runningTaskId] && data[runningTaskId].weight !== 0) {
+      console.warn(data[runningTaskId].weight);
+      handleChangePosition(
+        runningTaskId,
+        sortedTask.findIndex((taskId) => taskId === runningTaskId),
+        0,
+      );
+    }
+  }, [runningTaskId, data]);
+
+  useEffect(() => {
+    // nothing running
+    if (!runningTaskId || !data[runningTaskId]) return setCountdown(initialStateCountdown);
+
+    const date = moment()
+      .set({ hours: 0, minutes: 0, seconds: 0, ms: 0 })
+      .add(data[runningTaskId].maxTime, 'ms')
+      .add(-data[runningTaskId].timeElapsed, 'ms');
+
+    let elapsed = data[runningTaskId].timeElapsed;
+
+    setCountdown(date.format(defaultFormat));
+
+    if (selectedTask === runningTaskId) return; // stop when modal is opened
+
+    const interval = setInterval(async () => {
+      elapsed += 1000;
+      date.add(-1, 's');
+      handleAddElapsedTime(elapsed);
+      const currentCountdown = date.format(defaultFormat);
+      setCountdown(currentCountdown);
+
+      if (elapsed >= data[runningTaskId].maxTime) {
+        clearInterval(interval);
+        runningTaskId &&
+          update(runningTaskId, { status: TaskStatus.completed, timeElapsed: data[runningTaskId].maxTime });
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [runningTaskId, data, selectedTask]);
+
   return (
     <TaskManagerContext.Provider
       value={{
@@ -74,10 +136,13 @@ const TaskManagerContextProvider = ({ children }: TaskManagerContextProps): Reac
         sortedTask,
         tasks: data,
         selectTask: handleSelectTask,
+        selectedTask,
+        runningTaskId,
+        countdown,
       }}
     >
       {children}
-      <Task open={openTaskEditor} onClose={handleToggleTaskEditor} task={selectedTaskState} />
+      {openTaskEditor && <Task open={openTaskEditor} onClose={handleToggleTaskEditor} task={selectedTaskState} />}
     </TaskManagerContext.Provider>
   );
 };
