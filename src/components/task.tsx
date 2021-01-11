@@ -158,11 +158,12 @@ const TaskEditor = ({ open, onClose, task }: TaskCreateProps): ReactElement => {
                 labelWidth={47}
                 id="select"
                 value={state.status}
-                disabled={loading}
+                disabled={loading || state.status === TaskStatus.completed}
                 onChange={(e) => setState({ ...state, status: Number(e.target.value) })}
               >
                 <MenuItem value={TaskStatus.pending}>Pending</MenuItem>
                 <MenuItem value={TaskStatus.running}>Running</MenuItem>
+                <MenuItem value={TaskStatus.paused}>Paused</MenuItem>
                 <MenuItem value={TaskStatus.completed}>Completed</MenuItem>
               </Select>
             </FormControl>
@@ -177,7 +178,7 @@ const TaskEditor = ({ open, onClose, task }: TaskCreateProps): ReactElement => {
                 id="select-track"
                 fullWidth
                 value={timeAux || state.maxTime}
-                disabled={loading}
+                disabled={loading || state.status === TaskStatus.completed}
                 onChange={(e) => {
                   const value = Number(e.target.value);
                   if (value) {
@@ -189,7 +190,15 @@ const TaskEditor = ({ open, onClose, task }: TaskCreateProps): ReactElement => {
                 <MenuItem value={1000 * 60 * 30}>Short</MenuItem>
                 <MenuItem value={1000 * 60 * 45}>Medium</MenuItem>
                 <MenuItem value={1000 * 60 * 60}>Long</MenuItem>
-                <MenuItem value={timeAux || 0}>Custom</MenuItem>
+                <MenuItem
+                  value={
+                    timeAux || ![1000 * 60 * 30, 1000 * 60 * 45, 1000 * 60 * 60].includes(state.maxTime)
+                      ? state.maxTime
+                      : 0
+                  }
+                >
+                  Custom
+                </MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -198,7 +207,11 @@ const TaskEditor = ({ open, onClose, task }: TaskCreateProps): ReactElement => {
               <TextField
                 inputProps={{ maxLength: 5 }}
                 label="Time"
-                disabled={loading || !timeAux}
+                disabled={
+                  loading ||
+                  state.status === TaskStatus.completed ||
+                  (![1000 * 60 * 30, 1000 * 60 * 45, 1000 * 60 * 60].includes(state.maxTime) ? false : true)
+                }
                 value={inputTime}
                 onChange={handleChangeCustomTime}
                 InputProps={{
