@@ -10,7 +10,7 @@ export interface Task {
 }
 
 export enum TaskStatus {
-  completed = 3,
+  completed = 4,
   paused = 3,
   running = 1,
   pending = 0,
