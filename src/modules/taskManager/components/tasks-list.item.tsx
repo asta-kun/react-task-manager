@@ -87,11 +87,9 @@ const TaskListItem = ({
             </Box>
           </Grid>
         )}
-        {task.id !== runningTaskId && (
-          <Grid item xs={1} className={clsx(classes.timeElapsed, active && 'active')}>
-            <span>{timeElapsed}</span>
-          </Grid>
-        )}
+        <Grid item xs={1} className={clsx(classes.timeElapsed, active && 'active')}>
+          <span>{timeElapsed}</span>
+        </Grid>
 
         {showControls && (
           <Grid item xs={4} md={3}>
