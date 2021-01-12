@@ -47,39 +47,51 @@ const TasksList = ({
     state,
   ]);
 
+  const realFilteredTask = useMemo(() => filteredTasks.filter((taskId) => showStatus.includes(state[taskId].status)), [
+    state,
+    filteredTasks,
+    showStatus,
+  ]);
+
   return (
     <Box className={classes.root}>
-      {(filteredTasks.length > 0 &&
-        filteredTasks.map((taskId) => (
-          <Draggable draggableId={taskId} index={state[taskId].weight} key={taskId}>
-            {(provided) => (
-              <div ref={provided.innerRef} {...provided.dragHandleProps} {...provided.draggableProps}>
-                {showStatus.includes(state[taskId].status) && (
-                  <TaskListItem
-                    task={state[taskId]}
-                    draggable={
-                      (state[taskId].status !== TaskStatus.running && (
-                        <IconButton {...provided.dragHandleProps}>
-                          <DragIndicatorIcon />
-                        </IconButton>
-                      )) || (
-                        <IconButton disabled>
-                          <StarBorderIcon />
-                        </IconButton>
-                      )
-                    }
-                    {...itemProps}
-                  />
+      {(realFilteredTask.length > 0 &&
+        filteredTasks.map(
+          (taskId) =>
+            (itemProps.draggable && (
+              <Draggable draggableId={taskId} index={state[taskId].weight} key={taskId}>
+                {(provided) => (
+                  <div ref={provided.innerRef} {...provided.dragHandleProps} {...provided.draggableProps}>
+                    {showStatus.includes(state[taskId].status) && (
+                      <TaskListItem
+                        {...itemProps}
+                        task={state[taskId]}
+                        draggable={
+                          (state[taskId].status !== TaskStatus.running && (
+                            <IconButton {...provided.dragHandleProps}>
+                              <DragIndicatorIcon />
+                            </IconButton>
+                          )) || (
+                            <IconButton disabled>
+                              <StarBorderIcon />
+                            </IconButton>
+                          )
+                        }
+                      />
+                    )}
+                  </div>
                 )}
-              </div>
-            )}
-          </Draggable>
-        ))) || (
+              </Draggable>
+            )) ||
+            (showStatus.includes(state[taskId].status) && (
+              <TaskListItem key={taskId} task={state[taskId]} {...itemProps} />
+            )),
+        )) || (
         <Box className={classes.error}>
           <span>
             <ErrorOutlineOutlinedIcon fontSize="large" />
           </span>
-          <span>Not tasks</span>
+          <span>Add some task</span>
         </Box>
       )}
     </Box>

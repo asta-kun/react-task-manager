@@ -11,21 +11,21 @@ const MainContainer = (): ReactElement => {
   return (
     <Box className={classes.root}>
       <Grid container justify="space-between">
-        <Grid item xs={7}>
+        <Grid item md={7} xs={12}>
           <Timer />
           <br />
           <TasksList
             showStatus={[TaskStatus.running, TaskStatus.paused, TaskStatus.pending]}
-            itemProps={{ showStatus: true, showControls: true }}
+            itemProps={{ showStatus: true, showControls: true, draggable: true }}
             listId="1"
           />
         </Grid>
-        <Grid item xs={4}>
+        <Grid item md={4} xs={12}>
           <Stats />
           <TasksList
             listId="2"
             showStatus={[TaskStatus.completed]}
-            itemProps={{ draggable: false, showStatus: true, showControls: true }}
+            itemProps={{ draggable: false, showStatus: true, showDetails: true }}
           />
         </Grid>
       </Grid>
