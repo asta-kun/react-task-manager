@@ -41,10 +41,11 @@ const TasksList = ({
     setState(items);
   }, [tasks, sortedTask]);
 
-  const filteredTasks = useMemo(
-    () => sortedTask.filter((taskId) => !isEmpty(state[taskId]) && showStatus.includes(state[taskId].status)),
-    [sortedTask, showStatus, state],
-  );
+  const filteredTasks = useMemo(() => sortedTask.filter((taskId) => !isEmpty(state[taskId])), [
+    sortedTask,
+    showStatus,
+    state,
+  ]);
 
   return (
     <Box className={classes.root}>
@@ -52,22 +53,24 @@ const TasksList = ({
         filteredTasks.map((taskId) => (
           <Draggable draggableId={taskId} index={state[taskId].weight} key={taskId}>
             {(provided) => (
-              <div {...provided.draggableProps} ref={provided.innerRef}>
-                <TaskListItem
-                  task={state[taskId]}
-                  draggable={
-                    (state[taskId].status !== TaskStatus.running && (
-                      <IconButton {...provided.dragHandleProps}>
-                        <DragIndicatorIcon />
-                      </IconButton>
-                    )) || (
-                      <IconButton disabled>
-                        <StarBorderIcon />
-                      </IconButton>
-                    )
-                  }
-                  {...itemProps}
-                />
+              <div ref={provided.innerRef} {...provided.dragHandleProps} {...provided.draggableProps}>
+                {showStatus.includes(state[taskId].status) && (
+                  <TaskListItem
+                    task={state[taskId]}
+                    draggable={
+                      (state[taskId].status !== TaskStatus.running && (
+                        <IconButton {...provided.dragHandleProps}>
+                          <DragIndicatorIcon />
+                        </IconButton>
+                      )) || (
+                        <IconButton disabled>
+                          <StarBorderIcon />
+                        </IconButton>
+                      )
+                    }
+                    {...itemProps}
+                  />
+                )}
               </div>
             )}
           </Draggable>
@@ -83,9 +86,10 @@ const TasksList = ({
   );
 };
 
-const Wrapper = (props: TaskListProps): ReactElement => {
+const Wrapper = ({ listId, ...props }: TaskListProps & { listId: string }): ReactElement => {
   const [inArea, setInArea] = useState<boolean>(true);
   const { changePosition } = useTaskManager();
+
   const onDragEnd = useCallback(
     (e: DropResult) => {
       e.reason === 'DROP' && inArea && changePosition(e.draggableId, e.source.index, e.destination?.index || 0);
@@ -95,7 +99,7 @@ const Wrapper = (props: TaskListProps): ReactElement => {
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <Droppable droppableId="list">
+      <Droppable droppableId={listId}>
         {(provided) => (
           <div
             ref={provided.innerRef}

@@ -17,11 +17,13 @@ const MainContainer = (): ReactElement => {
           <TasksList
             showStatus={[TaskStatus.running, TaskStatus.paused, TaskStatus.pending]}
             itemProps={{ showStatus: true, showControls: true }}
+            listId="1"
           />
         </Grid>
         <Grid item xs={4}>
           <Stats />
           <TasksList
+            listId="2"
             showStatus={[TaskStatus.completed]}
             itemProps={{ draggable: false, showStatus: true, showControls: true }}
           />
