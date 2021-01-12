@@ -121,7 +121,11 @@ const TaskManagerContextProvider = ({ children }: TaskManagerContextProps): Reac
       if (elapsed >= data[runningTaskId].maxTime) {
         clearInterval(interval);
         runningTaskId &&
-          update(runningTaskId, { status: TaskStatus.completed, timeElapsed: data[runningTaskId].maxTime });
+          update(runningTaskId, {
+            status: TaskStatus.completed,
+            timeElapsed: data[runningTaskId].maxTime,
+            finishedAt: moment().toISOString(),
+          });
       }
     }, 1000);
 

@@ -25,6 +25,7 @@ export interface PayloadUpdate {
   maxTime?: number; // milliseconds
   weight?: number;
   timeElapsed?: number; // milliseconds
+  finishedAt?: string;
 }
 
 export interface Actions {

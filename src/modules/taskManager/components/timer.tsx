@@ -10,6 +10,7 @@ import StopIcon from '@material-ui/icons/Stop';
 import { useTaskActions } from '../../../api/tasks/list';
 import { TaskStatus } from '../../../request-type/tasks.d';
 import RotateLeftIcon from '@material-ui/icons/RotateLeft';
+import moment from 'moment';
 
 const Timer = (): ReactElement => {
   const classes = useStyles();
@@ -23,7 +24,7 @@ const Timer = (): ReactElement => {
   }, [runningTaskId, update]);
 
   const handleStop = useCallback(() => {
-    runningTaskId && update(runningTaskId, { status: TaskStatus.completed });
+    runningTaskId && update(runningTaskId, { status: TaskStatus.completed, finishedAt: moment().toISOString() });
   }, [runningTaskId, update]);
 
   const handleReset = useCallback(() => {
