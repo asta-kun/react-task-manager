@@ -8,6 +8,7 @@ const useStyles = makeStyles((theme) => ({
     height: '3.5em',
     background: '#fff',
     borderRadius: 3,
+    cursor: 'pointer',
     padding: '0 1em',
     willChange: 'transform, background',
     transition: 'all .5s',

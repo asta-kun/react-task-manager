@@ -4,11 +4,11 @@ import TaskListItem, { TaskListOptionalProps } from './tasks-list.item';
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
 import { useTaskManager } from '../../../management/task-manager';
 import { Task, TaskStatus } from '../../../request-type/tasks.d';
-import { isEmpty } from 'lodash';
 import useStyles from './task-list.style';
 import DragIndicatorIcon from '@material-ui/icons/DragIndicator';
 import StarBorderIcon from '@material-ui/icons/StarBorder';
 import ErrorOutlineOutlinedIcon from '@material-ui/icons/ErrorOutlineOutlined';
+import TaskListFilters, { FilterItem } from './task-list.filters';
 
 type State = {
   [taskId: string]: Task;
@@ -19,6 +19,11 @@ type TaskListProps = {
   itemProps?: TaskListOptionalProps;
 };
 
+export type Filter = {
+  search: string;
+  duration: FilterItem;
+};
+
 const TasksList = ({
   showStatus = [TaskStatus.paused, TaskStatus.pending, TaskStatus.running, TaskStatus.completed],
   itemProps = {},
@@ -26,8 +31,9 @@ const TasksList = ({
   const classes = useStyles();
   const { sortedTask, tasks } = useTaskManager();
   const [state, setState] = useState<State>(tasks);
+  const [filters, setFilters] = useState<Filter>({ search: '', duration: FilterItem.all });
 
-  // interal sort for the list
+  // interal sort for the list (ignore real indexs)
   useEffect(() => {
     let count = 0;
     const items = Object.values(sortedTask).reduce((state, taskId) => {
@@ -41,12 +47,46 @@ const TasksList = ({
     setState(items);
   }, [tasks, sortedTask]);
 
-  const filteredTasks = useMemo(() => sortedTask.filter((taskId) => !isEmpty(state[taskId])), [
-    sortedTask,
-    showStatus,
-    state,
+  // check data is fully charged (prevent undefined indexs)
+  const filteredTasks = useMemo(
+    () =>
+      sortedTask.filter((taskId) => {
+        if (isEmpty(state[taskId])) return false;
+
+        // always show running
+        // if (state[taskId].status === TaskStatus.running) return true;
+
+        // description (can be null)
+        if (filters.search && !(state[taskId].description || '').toLowerCase().includes(filters.search.toLowerCase()))
+          return false;
+
+        // duration short
+        if (filters.duration === FilterItem.short) {
+          if (state[taskId].timeElapsed > 1000 * 60 * 30) return false;
+        }
+
+        // medium
+        if (filters.duration === FilterItem.medium) {
+          if (!(state[taskId].timeElapsed >= 1000 * 60 * 30 && state[taskId].timeElapsed <= 1000 * 60 * 60))
+            return false;
+        }
+
+        // long
+        if (filters.duration === FilterItem.short) {
+          if (state[taskId].timeElapsed <= 1000 * 60 * 60) return false;
+        }
+
+        return true;
+      }),
+    [sortedTask, showStatus, state, filters],
+  );
+
+  const handleUpdateFIlters = useCallback((newFilters: Filter) => setFilters({ ...filters, ...newFilters }), [
+    setFilters,
+    filters,
   ]);
 
+  // apply custom filters
   const realFilteredTask = useMemo(() => filteredTasks.filter((taskId) => showStatus.includes(state[taskId].status)), [
     state,
     filteredTasks,
@@ -55,6 +95,10 @@ const TasksList = ({
 
   return (
     <Box className={classes.root}>
+      {/* filters */}
+      <TaskListFilters updateState={handleUpdateFIlters} />
+
+      {/* items */}
       {(realFilteredTask.length > 0 &&
         filteredTasks.map(
           (taskId) =>
