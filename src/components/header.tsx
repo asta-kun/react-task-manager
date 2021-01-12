@@ -2,9 +2,12 @@ import { Button, Grid } from '@material-ui/core';
 import React, { ReactElement } from 'react';
 import AccessAlarmIcon from '@material-ui/icons/AccessAlarm';
 import useStyles from './header.style';
+import { useLocation } from 'react-router';
 
 const Header = (): ReactElement => {
   const classes = useStyles();
+  const { pathname } = useLocation();
+
   return (
     <header>
       <Grid container justify="space-between" alignItems="center" className={classes.root}>
@@ -20,12 +23,16 @@ const Header = (): ReactElement => {
         <Grid item xs={2}>
           <Grid container justify="space-around">
             <Grid item xs={5}>
-              <Button variant="outlined" fullWidth>
+              <Button variant="outlined" fullWidth color={(pathname === '/taskManager' && 'primary') || 'default'}>
                 Timer
               </Button>
             </Grid>
             <Grid item xs={5}>
-              <Button variant="outlined" fullWidth>
+              <Button
+                variant="outlined"
+                fullWidth
+                color={(pathname === '/taskManager/stats' && 'primary') || 'default'}
+              >
                 Stats
               </Button>
             </Grid>

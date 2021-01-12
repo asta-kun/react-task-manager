@@ -11,8 +11,8 @@ const Index = () => {
 
 const ModuleRouter = (): ReactElement => {
   return (
-    <BasePage>
-      <Router>
+    <Router>
+      <BasePage>
         <Suspense fallback={<>Loading...</>}>
           <Switch>
             <Route path="/" exact strict>
@@ -23,8 +23,8 @@ const ModuleRouter = (): ReactElement => {
             </Route>
           </Switch>
         </Suspense>
-      </Router>
-    </BasePage>
+      </BasePage>
+    </Router>
   );
 };
 
