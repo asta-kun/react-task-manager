@@ -70,8 +70,12 @@ export const useTaskActions = (): Actions => {
       createdAt: moment().toISOString(),
       finishedAt: null,
     };
-
     window.localStorage.setItem(newTask.id, JSON.stringify(newTask));
+
+    // unshift new item
+    [newTask, ...tasks].forEach((task, index) => {
+      update(task.id, { weight: index });
+    });
 
     mutateList();
 
