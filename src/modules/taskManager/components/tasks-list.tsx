@@ -62,23 +62,25 @@ const TasksList = ({
               <Draggable draggableId={taskId} index={state[taskId].weight} key={taskId}>
                 {(provided) => (
                   <div ref={provided.innerRef} {...provided.dragHandleProps} {...provided.draggableProps}>
-                    {showStatus.includes(state[taskId].status) && (
-                      <TaskListItem
-                        {...itemProps}
-                        task={state[taskId]}
-                        draggable={
-                          (state[taskId].status !== TaskStatus.running && (
-                            <IconButton {...provided.dragHandleProps}>
-                              <DragIndicatorIcon />
-                            </IconButton>
-                          )) || (
-                            <IconButton disabled>
-                              <StarBorderIcon />
-                            </IconButton>
-                          )
-                        }
-                      />
-                    )}
+                    <Box style={{ margin: '.9em 0' }}>
+                      {showStatus.includes(state[taskId].status) && (
+                        <TaskListItem
+                          {...itemProps}
+                          task={state[taskId]}
+                          draggable={
+                            (state[taskId].status !== TaskStatus.running && (
+                              <IconButton {...provided.dragHandleProps}>
+                                <DragIndicatorIcon />
+                              </IconButton>
+                            )) || (
+                              <IconButton disabled>
+                                <StarBorderIcon />
+                              </IconButton>
+                            )
+                          }
+                        />
+                      )}
+                    </Box>
                   </div>
                 )}
               </Draggable>
