@@ -78,14 +78,14 @@ const TaskEditor = ({ open, onClose, task }: TaskCreateProps): ReactElement => {
 
   const handleChangeCustomTime = (e: ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value.replace(/[^0-9\:]/gi, ''); // clear alphabet
-    let found = false;
+    let found = 0;
     value = value
       .split('')
       .filter((item) => {
-        if (item === ':' && found) {
+        if (item === ':' && found === 2) {
           return false;
         } else if (item === ':') {
-          found = true;
+          found += 1;
         }
         return true;
       })
@@ -95,12 +95,16 @@ const TaskEditor = ({ open, onClose, task }: TaskCreateProps): ReactElement => {
       if (!found) value += ':';
     }
 
-    // checks error
-    if (value.length !== 5) setErrorKind(CustomErrors.invalidFormat);
-    else {
-      const [hours, minutes] = value.split(':').map((item) => Number(item));
+    if (inputTime.length < value.length && value.length === 5) {
+      if (found === 1) value += ':';
+    }
 
-      const totalMinutes = hours * 60 + minutes;
+    // checks error
+    if (value.length !== 8) setErrorKind(CustomErrors.invalidFormat);
+    else {
+      const [hours, minutes, seconds] = value.split(':').map((item) => Number(item));
+
+      const totalMinutes = hours * 60 + minutes + seconds / 60;
       if (totalMinutes > 120) setErrorKind(CustomErrors.invalidTime);
       else {
         setErrorKind(null);
@@ -115,9 +119,9 @@ const TaskEditor = ({ open, onClose, task }: TaskCreateProps): ReactElement => {
 
   useEffect(() => {
     const date = moment()
-      .set({ hour: 0, minute: 0, millisecond: 0 })
+      .set({ hour: 0, minute: 0, millisecond: 0, seconds: 0 })
       .add(timeAux || state.maxTime, 'ms')
-      .format('HH:mm');
+      .format('HH:mm:ss');
     setInputTime(date);
   }, [state.maxTime]);
 
@@ -181,37 +185,24 @@ const TaskEditor = ({ open, onClose, task }: TaskCreateProps): ReactElement => {
                 disabled={loading || state.status === TaskStatus.completed}
                 onChange={(e) => {
                   const value = Number(e.target.value);
-                  if (value) {
-                    setState({ ...state, maxTime: value });
-                    setTimeAux(0);
-                  } else setTimeAux(state.maxTime);
+                  setState({ ...state, maxTime: value });
+                  setTimeAux(0);
+                  setErrorKind(null);
                 }}
               >
                 <MenuItem value={1000 * 60 * 30}>Short</MenuItem>
                 <MenuItem value={1000 * 60 * 45}>Medium</MenuItem>
                 <MenuItem value={1000 * 60 * 60}>Long</MenuItem>
-                <MenuItem
-                  value={
-                    timeAux || ![1000 * 60 * 30, 1000 * 60 * 45, 1000 * 60 * 60].includes(state.maxTime)
-                      ? state.maxTime
-                      : 0
-                  }
-                >
-                  Custom
-                </MenuItem>
+                <MenuItem value={timeAux}>Custom</MenuItem>
               </Select>
             </FormControl>
           </Grid>
           <Grid item xs={12}>
             <FormControl fullWidth variant="outlined" size="small">
               <TextField
-                inputProps={{ maxLength: 5 }}
+                inputProps={{ maxLength: 8 }}
                 label="Time"
-                disabled={
-                  loading ||
-                  state.status === TaskStatus.completed ||
-                  (![1000 * 60 * 30, 1000 * 60 * 45, 1000 * 60 * 60].includes(state.maxTime) ? false : true)
-                }
+                disabled={loading || state.status === TaskStatus.completed}
                 value={inputTime}
                 onChange={handleChangeCustomTime}
                 InputProps={{
@@ -260,7 +251,7 @@ const TaskEditor = ({ open, onClose, task }: TaskCreateProps): ReactElement => {
                       color="primary"
                       onClick={handleSave}
                       fullWidth
-                      disabled={disabled || loading}
+                      disabled={disabled || loading || state.maxTime <= 0}
                     >
                       <SaveIcon fontSize="small" />
                       <span style={{ marginLeft: 5 }}>Save</span>
