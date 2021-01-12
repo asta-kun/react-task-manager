@@ -87,7 +87,6 @@ const TaskManagerContextProvider = ({ children }: TaskManagerContextProps): Reac
 
   useEffect(() => {
     if (runningTaskId && data[runningTaskId] && data[runningTaskId].weight !== 0) {
-      console.warn(data[runningTaskId].weight);
       handleChangePosition(
         runningTaskId,
         sortedTask.findIndex((taskId) => taskId === runningTaskId),
