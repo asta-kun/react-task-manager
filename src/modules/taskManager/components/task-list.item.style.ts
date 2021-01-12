@@ -12,11 +12,22 @@ const useStyles = makeStyles((theme) => ({
     padding: '0 1em',
     willChange: 'transform, background',
     transition: 'all .5s',
+    animation: '$enter .5s ease-out',
     '&:hover': {
       transform: 'scale(1.025)',
     },
     '&.active': {
       background: '#4168d6',
+    },
+  },
+  '@keyframes enter': {
+    from: {
+      opacity: 0,
+      transform: 'translateY(-10px)',
+    },
+    to: {
+      opacity: 1,
+      transform: 'translateY(0)',
     },
   },
   description: {

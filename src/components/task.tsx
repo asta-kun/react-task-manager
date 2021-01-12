@@ -162,7 +162,7 @@ const TaskEditor = ({ open, onClose, task }: TaskCreateProps): ReactElement => {
                 labelWidth={47}
                 id="select"
                 value={state.status}
-                disabled={loading || state.status === TaskStatus.completed}
+                disabled
                 onChange={(e) => setState({ ...state, status: Number(e.target.value) })}
               >
                 <MenuItem value={TaskStatus.pending}>Pending</MenuItem>

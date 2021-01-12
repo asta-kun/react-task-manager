@@ -37,7 +37,7 @@ const TaskListFilters = ({ updateState }: TaskListFiltersProps): ReactElement =>
     <Grid container justify="space-between" className={classes.root}>
       <Grid item>
         <TextField
-          placeholder="Search..."
+          placeholder="write something..."
           label="Search"
           variant="outlined"
           size="small"
