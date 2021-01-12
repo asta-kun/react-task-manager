@@ -1,6 +1,6 @@
 import { makeStyles } from '@material-ui/core';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     padding: '0 2.5%',
     background: '#fff',
@@ -13,6 +13,9 @@ const useStyles = makeStyles(() => ({
   h1: {
     fontSize: '1.25em',
     marginLeft: '.5em',
+    [theme.breakpoints.down('sm')]: {
+      display: 'none',
+    },
   },
 }));
 export default useStyles;
