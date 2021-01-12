@@ -1,6 +1,6 @@
 import { makeStyles } from '@material-ui/core';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     padding: '.5em 1em',
     borderRadius: 4,
@@ -17,9 +17,8 @@ const useStyles = makeStyles(() => ({
     borderRadius: 5,
     '& span': {
       zIndex: 5,
-      display: 'block',
-      left: '25%',
-      position: 'absolute',
+
+      position: 'relative',
     },
     '&.active': {
       color: '#fff',
@@ -31,6 +30,15 @@ const useStyles = makeStyles(() => ({
     background: '#b54d4d',
     zIndex: 4,
     position: 'absolute',
+  },
+  button: {
+    display: 'block',
+    margin: '0 auto',
+  },
+  actions: {
+    [theme.breakpoints.down('sm')]: {
+      marginTop: '.75em',
+    },
   },
 }));
 export default useStyles;

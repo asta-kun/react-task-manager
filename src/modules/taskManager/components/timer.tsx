@@ -52,32 +52,32 @@ const Timer = (): ReactElement => {
   return (
     <Box className={classes.root}>
       <Grid container alignItems="center" justify="space-between">
-        <Grid item xs={7}>
+        <Grid item xs={12} md={8}>
           <Box className={clsx(classes.time, runningTaskId && 'active')}>
             <div className={classes.loading} ref={loadingRef}></div>
             <span>{countdown}</span>
           </Box>
         </Grid>
 
-        <Grid item xs={4}>
+        <Grid item xs={12} md={4} className={classes.actions}>
           <Grid container justify="space-evenly" alignItems="center">
             <Grid item xs={3}>
-              <IconButton onClick={handlePause} disabled={!runningTaskId}>
+              <IconButton onClick={handlePause} disabled={!runningTaskId} className={classes.button}>
                 <PauseIcon />
               </IconButton>
             </Grid>
             <Grid item xs={3}>
-              <IconButton onClick={handleStop} disabled={!runningTaskId}>
+              <IconButton onClick={handleStop} disabled={!runningTaskId} className={classes.button}>
                 <StopIcon />
               </IconButton>
             </Grid>
             <Grid item xs={3}>
-              <IconButton onClick={handleReset} disabled={!runningTaskId}>
+              <IconButton onClick={handleReset} disabled={!runningTaskId} className={classes.button}>
                 <RotateLeftIcon />
               </IconButton>
             </Grid>
             <Grid item xs={3}>
-              <IconButton onClick={create}>
+              <IconButton onClick={create} className={classes.button}>
                 <AddIcon />
               </IconButton>
             </Grid>

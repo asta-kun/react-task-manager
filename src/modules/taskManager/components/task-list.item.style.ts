@@ -1,6 +1,6 @@
 import { makeStyles } from '@material-ui/core';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     width: '95%',
     margin: '1em auto',
@@ -9,10 +9,13 @@ const useStyles = makeStyles(() => ({
     background: '#fff',
     borderRadius: 3,
     padding: '0 1em',
-    willChange: 'transform',
-    transition: 'transform .5s',
+    willChange: 'transform, background',
+    transition: 'all .5s',
     '&:hover': {
       transform: 'scale(1.025)',
+    },
+    '&.active': {
+      background: '#4168d6',
     },
   },
   description: {
@@ -21,6 +24,9 @@ const useStyles = makeStyles(() => ({
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
+    '&.active': {
+      color: '#fff',
+    },
   },
   status: {
     '& span': {
@@ -44,6 +50,38 @@ const useStyles = makeStyles(() => ({
       '&.paused': {
         background: '#ff7f24',
       },
+      '&.active': {
+        background: '#fff',
+        color: '#000',
+      },
+    },
+    [theme.breakpoints.down('sm')]: {
+      fontSize: '.85em',
+    },
+  },
+  iconDetails: {
+    transform: 'rotate(-90deg)',
+    color: '#000',
+    transition: 'all .5s ease',
+    willChange: 'transform, color',
+    fontSize: '.7em',
+    '&.active': {
+      transform: 'rotate(90deg)',
+      color: '#fff',
+    },
+  },
+  details: {
+    textAlign: 'center',
+    fontSize: '.9em',
+  },
+  timeElapsed: {
+    fontSize: '.7em',
+    color: '#949494',
+    textAlign: 'center',
+    display: 'block',
+    paddingLeft: 20,
+    '&.active': {
+      color: '#fff',
     },
   },
 }));
