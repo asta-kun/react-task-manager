@@ -9,6 +9,7 @@ import DragIndicatorIcon from '@material-ui/icons/DragIndicator';
 import StarBorderIcon from '@material-ui/icons/StarBorder';
 import ErrorOutlineOutlinedIcon from '@material-ui/icons/ErrorOutlineOutlined';
 import TaskListFilters, { FilterItem } from './task-list.filters';
+import { isEmpty } from 'lodash';
 
 type State = {
   [taskId: string]: Task;
