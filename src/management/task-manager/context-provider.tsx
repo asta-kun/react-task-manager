@@ -1,7 +1,9 @@
 import moment from 'moment';
 import React, { ReactElement, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
+import { useLocation } from 'react-router';
 import { useTaskActions, useTasks } from '../../api/tasks/list';
 import Task, { State } from '../../components/task';
+import MiniTimer from '../../modules/taskManager/components/mini-timer';
 import { TaskStatus } from '../../request-type/tasks.d';
 import { TaskManagerContext } from './context';
 
@@ -19,6 +21,7 @@ type TaskManagerContextProps = {
 };
 
 const TaskManagerContextProvider = ({ children }: TaskManagerContextProps): ReactElement => {
+  const { pathname } = useLocation();
   const { update } = useTaskActions();
   const { tasks, data } = useTasks(moment());
   const [runningTaskId, setRunningTaskId] = useState<string | null>(null);
@@ -119,12 +122,13 @@ const TaskManagerContextProvider = ({ children }: TaskManagerContextProps): Reac
 
       if (elapsed >= data[runningTaskId].maxTime) {
         clearInterval(interval);
-        runningTaskId &&
-          update(runningTaskId, {
-            status: TaskStatus.completed,
-            timeElapsed: data[runningTaskId].maxTime,
-            finishedAt: moment().toISOString(),
-          });
+
+        update(runningTaskId, {
+          status: TaskStatus.completed,
+          timeElapsed: data[runningTaskId].maxTime,
+          finishedAt: moment().toISOString(),
+        });
+        setRunningTaskId(null);
       }
     }, 1000);
 
@@ -145,7 +149,11 @@ const TaskManagerContextProvider = ({ children }: TaskManagerContextProps): Reac
       }}
     >
       {children}
+      {/* global component to edit/create tasks */}
       {openTaskEditor && <Task open={openTaskEditor} onClose={handleToggleTaskEditor} task={selectedTaskState} />}
+
+      {/* mini countdown 7u7 */}
+      {pathname !== '/taskManager' && <MiniTimer />}
     </TaskManagerContext.Provider>
   );
 };
