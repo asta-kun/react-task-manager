@@ -68,12 +68,11 @@ const TasksList = ({
 
         // medium
         if (filters.duration === FilterItem.medium) {
-          if (!(state[taskId].timeElapsed >= 1000 * 60 * 30 && state[taskId].timeElapsed <= 1000 * 60 * 60))
-            return false;
+          if (!(state[taskId].timeElapsed > 1000 * 60 * 30 && state[taskId].timeElapsed < 1000 * 60 * 60)) return false;
         }
 
         // long
-        if (filters.duration === FilterItem.short) {
+        if (filters.duration === FilterItem.long) {
           if (state[taskId].timeElapsed <= 1000 * 60 * 60) return false;
         }
 
