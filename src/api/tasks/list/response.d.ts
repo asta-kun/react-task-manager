@@ -25,11 +25,12 @@ export interface PayloadUpdate {
   maxTime?: number; // milliseconds
   weight?: number;
   timeElapsed?: number; // milliseconds
-  finishedAt?: string;
+  finishedAt?: string | null;
+  createdAt?: string;
 }
 
 export interface Actions {
-  create: (state: PayloadCreate) => Promise<string>; // returns id
-  update: (taskId: string, state: PayloadUpdate) => Promise<void>; // throw error
-  remove: (taskId: string) => Promise<void>; // throw error
+  create: (state: PayloadCreate, mutate?: boolean) => Promise<string>; // returns id
+  update: (taskId: string, state: PayloadUpdate, mutate?: boolean) => Promise<void>; // throw error
+  remove: (taskId: string, mutate?: boolean) => Promise<void>; // throw error
 }
