@@ -5,7 +5,7 @@ import { Task, TaskStatus } from '../../../request-type/tasks.d';
 import { nanoid } from 'nanoid';
 import moment, { Moment } from 'moment';
 
-const BASE_END_POINT = '/process.api/karts';
+const BASE_END_POINT = '/process.api/task';
 const END_POINT_LIST = `${BASE_END_POINT}/list`;
 
 export const mutateList = async () => globalMutation(END_POINT_LIST);
@@ -47,7 +47,7 @@ export const useTasks = (date: Moment): Response => {
 };
 
 export const useTaskActions = (): Actions => {
-  const create = useCallback(async (rawPayload: PayloadCreate) => {
+  const create = useCallback(async (rawPayload: PayloadCreate, mutate = true) => {
     const startDate = moment().set({ day: 0, hour: 0, minute: 0, second: 0 });
     const endDate = startDate.clone().add(7, 'd');
     const tasks = getAllTask(startDate, endDate);
@@ -74,15 +74,15 @@ export const useTaskActions = (): Actions => {
 
     // unshift new item
     [newTask, ...tasks].forEach((task, index) => {
-      update(task.id, { weight: index });
+      update(task.id, { weight: index }, false);
     });
 
-    mutateList();
+    mutate && mutateList();
 
     return newTask.id;
   }, []);
 
-  const update = useCallback(async (taskId: string, rawPayload: PayloadUpdate) => {
+  const update = useCallback(async (taskId: string, rawPayload: PayloadUpdate, mutate = true) => {
     const rawTask: string = window.localStorage.getItem(taskId) || '';
     if (!rawTask) throw new Error();
     const task = JSON.parse(rawTask) as Task;
@@ -94,12 +94,12 @@ export const useTaskActions = (): Actions => {
     };
 
     window.localStorage.setItem(updatedTask.id, JSON.stringify(updatedTask));
-    mutateList();
+    mutate && mutateList();
   }, []);
 
-  const remove = useCallback(async (taskId: string) => {
+  const remove = useCallback(async (taskId: string, mutate = true) => {
     window.localStorage.removeItem(taskId);
-    mutateList();
+    mutate && mutateList();
   }, []);
 
   return { create, update, remove };
