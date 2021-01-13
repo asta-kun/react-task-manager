@@ -1,28 +1,21 @@
-import React from "react";
-import logo from "./logo.svg";
-import "./App.css";
-import AcUnitIcon from "@material-ui/icons/AcUnit";
+import React, { ReactElement } from 'react';
+import 'normalize.css';
+import './app.css';
+import ModuleRouter from './modules/_router';
+import { TaskManagerContextProvider } from './management/task-manager';
+import { ToastProvider } from 'react-toast-notifications';
+import { BrowserRouter as Router } from 'react-router-dom';
 
-function App() {
+const App = (): ReactElement => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <AcUnitIcon />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <ToastProvider autoDismiss={true} autoDismissTimeout={3000}>
+        <TaskManagerContextProvider>
+          <ModuleRouter />
+        </TaskManagerContextProvider>
+      </ToastProvider>
+    </Router>
   );
-}
+};
 
 export default App;
