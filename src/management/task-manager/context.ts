@@ -6,6 +6,7 @@ export type TaskManagerContext = {
   changePosition: (taskId: string, source: number, destination: number) => void;
   selectTask: (taskId: string) => void;
   countdown: string;
+  addRandomTasks: () => Promise<void>;
   sortedTask: string[];
   selectedTask: string | null;
   runningTaskId: string | null;
@@ -16,6 +17,9 @@ export type TaskManagerContext = {
 
 export const TaskManagerContext = createContext<TaskManagerContext>({
   // defaults
+  addRandomTasks: async () => {
+    // do nothing
+  },
   create: () => {
     // do nothing
   },

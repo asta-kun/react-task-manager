@@ -1,11 +1,13 @@
 import moment from 'moment';
 import React, { ReactElement, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router';
-import { useTaskActions, useTasks } from '../../api/tasks/list';
+import { mutateList, useTaskActions, useTasks } from '../../api/tasks/list';
 import Task, { State } from '../../components/task';
+import AddButton from '../../modules/taskManager/components/add-button';
 import MiniTimer from '../../modules/taskManager/components/mini-timer';
 import { TaskStatus } from '../../request-type/tasks.d';
 import { TaskManagerContext } from './context';
+import { getRandomInt } from './utils';
 
 const initialStateSelectedTask = {
   description: null,
@@ -22,7 +24,7 @@ type TaskManagerContextProps = {
 
 const TaskManagerContextProvider = ({ children }: TaskManagerContextProps): ReactElement => {
   const { pathname } = useLocation();
-  const { update } = useTaskActions();
+  const { update, create } = useTaskActions();
   const { tasks, data } = useTasks(moment());
   const [runningTaskId, setRunningTaskId] = useState<string | null>(null);
   const sortedTask = useMemo(() => tasks.sort((a, b) => data[a].weight - data[b].weight), [data, tasks]);
@@ -135,6 +137,41 @@ const TaskManagerContextProvider = ({ children }: TaskManagerContextProps): Reac
     return () => clearInterval(interval);
   }, [runningTaskId, data, selectedTask]);
 
+  const handleAddRandomTasks = useCallback(async () => {
+    const maxTimes = [
+      1000 * 60 * 60 * 2, // super long
+      1000 * 60 * 60, // long
+      1000 * 60 * 45, // medium
+      1000 * 60 * 30, // short
+    ];
+    let count = 50;
+    const _status = [TaskStatus.completed, TaskStatus.pending, TaskStatus.paused];
+    while (count >= 0) {
+      const day = getRandomInt(0, 6);
+      const hour = getRandomInt(0, 23);
+      const maxTime = maxTimes[getRandomInt(0, 3)];
+      const timeElapsed = maxTime - (maxTime * getRandomInt(0, 20)) / 100;
+      const status = _status[getRandomInt(0, 2)];
+
+      const taskId = await create({ description: `Task #${count}`, status, maxTime }, false);
+
+      await update(
+        taskId,
+        {
+          timeElapsed: status !== TaskStatus.pending ? timeElapsed : 0,
+          createdAt: moment().set({ day, hour }).toISOString(),
+          finishedAt:
+            status !== TaskStatus.pending ? moment().set({ day, hour }).add(timeElapsed, 'ms').toISOString() : null,
+        },
+        false,
+      );
+
+      count--;
+    }
+
+    mutateList();
+  }, [create, update, mutateList]);
+
   return (
     <TaskManagerContext.Provider
       value={{
@@ -146,14 +183,16 @@ const TaskManagerContextProvider = ({ children }: TaskManagerContextProps): Reac
         selectedTask,
         runningTaskId,
         countdown,
+        addRandomTasks: handleAddRandomTasks,
       }}
     >
       {children}
       {/* global component to edit/create tasks */}
       {openTaskEditor && <Task open={openTaskEditor} onClose={handleToggleTaskEditor} task={selectedTaskState} />}
-
       {/* mini countdown 7u7 */}
       {pathname !== '/taskManager' && <MiniTimer />}
+      {/* add 50 random tasks */}
+      <AddButton />
     </TaskManagerContext.Provider>
   );
 };
