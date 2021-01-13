@@ -1,5 +1,6 @@
 import { TaskStatus } from '../../request-type/tasks.d';
 
+// convert status (number) to string
 export const getStatusStrByCode = (status: TaskStatus): string => {
   switch (status) {
     case TaskStatus.completed:
@@ -19,6 +20,7 @@ export const getStatusStrByCode = (status: TaskStatus): string => {
   }
 };
 
+// simple random number
 export const getRandomInt = (min: number, max: number) => {
   min = Math.ceil(min);
   max = Math.floor(max);

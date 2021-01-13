@@ -3,6 +3,8 @@ import React, { ReactElement } from 'react';
 import { useTaskManager } from '../../../management/task-manager';
 import useStyles from './mini-timer.style';
 
+/* DEPRECATED */
+
 const MiniTimer = (): ReactElement => {
   const { countdown } = useTaskManager();
   const classes = useStyles();

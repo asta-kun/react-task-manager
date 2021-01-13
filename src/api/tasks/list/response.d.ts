@@ -1,5 +1,7 @@
 import { Task } from '../../../request-type/tasks';
 
+/* definitions */
+
 export interface Response {
   tasks: string[];
   data: {

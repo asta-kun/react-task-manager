@@ -1,3 +1,4 @@
+/* definitions */
 export interface Task {
   id: string;
   status: number;

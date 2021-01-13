@@ -76,6 +76,7 @@ const TaskManagerContextProvider = ({ children }: TaskManagerContextProps): Reac
     [runningTaskId, update, data],
   );
 
+  // trigger when a task is selected
   useEffect(() => {
     if (selectedTask) {
       setSelectedTaskState({ ...data[selectedTask] });
@@ -85,11 +86,13 @@ const TaskManagerContextProvider = ({ children }: TaskManagerContextProps): Reac
     }
   }, [selectedTask]);
 
+  //  get index of running task (only one)
   useEffect(() => {
     const runningTask = tasks.find((taskId) => data[taskId].status === TaskStatus.running);
     setRunningTaskId(runningTask || null);
   }, [tasks, data]);
 
+  // detect when a new tasks is started and is updated to first position
   useEffect(() => {
     if (runningTaskId && data[runningTaskId] && data[runningTaskId].weight !== 0) {
       handleChangePosition(
@@ -100,6 +103,7 @@ const TaskManagerContextProvider = ({ children }: TaskManagerContextProps): Reac
     }
   }, [runningTaskId, data]);
 
+  // controller to running tasks
   useEffect(() => {
     // nothing running
     if (!runningTaskId || !data[runningTaskId]) return setCountdown(initialStateCountdown);
@@ -137,6 +141,7 @@ const TaskManagerContextProvider = ({ children }: TaskManagerContextProps): Reac
     return () => clearInterval(interval);
   }, [runningTaskId, data, selectedTask]);
 
+  // generate 50 random tanks
   const handleAddRandomTasks = useCallback(async () => {
     const maxTimes = [
       1000 * 60 * 60 * 2, // super long

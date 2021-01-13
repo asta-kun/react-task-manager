@@ -8,18 +8,22 @@ import moment, { Moment } from 'moment';
 const BASE_END_POINT = '/process.api/task';
 const END_POINT_LIST = `${BASE_END_POINT}/list`;
 
+// trigger for mutate state
 export const mutateList = async () => globalMutation(END_POINT_LIST);
 
+// get tasks from localStorage
 const getAllTask = (startDate: Moment, endDate: Moment) =>
   Object.values(window.localStorage)
     .map((task: string) => JSON.parse(task) as Task)
     .filter((task) => moment(task.createdAt).isSameOrAfter(startDate) && moment(task.createdAt).isBefore(endDate));
 
 export const useTasks = (date: Moment): Response => {
-  // date + 1 week
+  // fetcher | get tasks by range (date + 1 week)
   const fetcher = useCallback(async (date: Moment): Promise<Response> => {
     const startDate = date.clone().set({ day: 0, hour: 0, minute: 0, second: 0 });
     const endDate = startDate.clone().add(7, 'd');
+
+    // all tasks
     const tasks = getAllTask(startDate, endDate);
 
     // generate friendly map
@@ -46,6 +50,7 @@ export const useTasks = (date: Moment): Response => {
   return data as Response;
 };
 
+// main actions | apply any action must mutate the state
 export const useTaskActions = (): Actions => {
   const create = useCallback(async (rawPayload: PayloadCreate, mutate = true) => {
     const startDate = moment().set({ day: 0, hour: 0, minute: 0, second: 0 });
@@ -60,6 +65,7 @@ export const useTaskActions = (): Actions => {
     // apply defaults
     const { description = '', status = TaskStatus.pending, maxTime = 1000 * 60 * 30 } = rawPayload;
 
+    // generate a new task
     const newTask: Task = {
       id: nanoid(),
       description,
@@ -70,6 +76,8 @@ export const useTaskActions = (): Actions => {
       createdAt: moment().toISOString(),
       finishedAt: null,
     };
+
+    // save task
     window.localStorage.setItem(newTask.id, JSON.stringify(newTask));
 
     // unshift new item
@@ -93,6 +101,7 @@ export const useTaskActions = (): Actions => {
       ...rawPayload,
     };
 
+    // update task
     window.localStorage.setItem(updatedTask.id, JSON.stringify(updatedTask));
     mutate && mutateList();
   }, []);

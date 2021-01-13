@@ -19,6 +19,7 @@ const Timer = (): ReactElement => {
   const loadingRef = useRef<HTMLDivElement>(null);
   const { current: tl } = useRef(gsap.timeline({ paused: true }));
 
+  // UI Actions
   const handlePause = useCallback(() => {
     runningTaskId && update(runningTaskId, { status: TaskStatus.paused });
   }, [runningTaskId, update]);

@@ -37,15 +37,16 @@ const TaskListItem = ({
   const [timeElapsed, setTimeElapsed] = useState<string>('00:00');
   const [active, setActive] = useState<boolean>(false);
 
+  // UI actions
   const handleRemove = useCallback(() => remove(task.id), [task, remove]);
   const handleSelect = useCallback(() => selectTask(task.id), [task, selectTask]);
   const handleToggleActive = useCallback(() => !draggable && setActive(!active), [active, draggable]);
-
   const handlePlay = useCallback(() => {
     update(task.id, { status: TaskStatus.running });
     runningTaskId && update(runningTaskId, { status: TaskStatus.paused });
   }, [update, task]);
 
+  // generate placeholder
   useEffect(() => {
     if (!task.timeElapsed) return;
     const placeholder = moment(task.timeElapsed)

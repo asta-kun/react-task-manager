@@ -27,7 +27,7 @@ type CustomErrorProps = {
 };
 const CustomError = ({ kind }: CustomErrorProps): ReactElement => {
   const classes = useStyles();
-
+  /* show a custom a beautiful error */
   return (
     <>
       {kind !== null && (
@@ -59,6 +59,7 @@ const TaskEditor = ({ open, onClose, task }: TaskCreateProps): ReactElement => {
   const [inputTime, setInputTime] = useState<string>('');
   const [errorKind, setErrorKind] = useState<CustomErrors | null>(null);
 
+  // save or update the task
   const handleSave = () => {
     setLoading(true);
     const payload = cloneDeep(state);
@@ -76,6 +77,7 @@ const TaskEditor = ({ open, onClose, task }: TaskCreateProps): ReactElement => {
       });
   };
 
+  // controler to "custom time" input
   const handleChangeCustomTime = (e: ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value.replace(/[^0-9\:]/gi, ''); // clear alphabet
     let found = 0;
@@ -125,14 +127,17 @@ const TaskEditor = ({ open, onClose, task }: TaskCreateProps): ReactElement => {
     setInputTime(date);
   }, [state.maxTime]);
 
+  // disabled save action when is detected any error
   useEffect(() => {
     setDisabled(errorKind !== null);
   }, [errorKind]);
 
+  // update state when task change (reset)
   useEffect(() => {
     setState({ ...initialState, ...task });
   }, [task]);
 
+  // reset state when the modal is closed
   useEffect(() => {
     !open &&
       setState({

@@ -81,6 +81,7 @@ const TasksList = ({
     [sortedTask, showStatus, state, filters],
   );
 
+  // callback to children (update filters state)
   const handleUpdateFIlters = useCallback((newFilters: Filter) => setFilters({ ...filters, ...newFilters }), [
     setFilters,
     filters,
@@ -144,6 +145,7 @@ const TasksList = ({
   );
 };
 
+// feature drag/drop
 const Wrapper = ({ listId, ...props }: TaskListProps & { listId: string }): ReactElement => {
   const [inArea, setInArea] = useState<boolean>(true);
   const { changePosition } = useTaskManager();
@@ -163,7 +165,7 @@ const Wrapper = ({ listId, ...props }: TaskListProps & { listId: string }): Reac
             ref={provided.innerRef}
             {...provided.droppableProps}
             onMouseEnter={() => setInArea(true)}
-            onMouseLeave={() => setInArea(false)}
+            onMouseLeave={() => setInArea(false)} // prevent drop to 0 position
           >
             <TasksList {...props} />
             {provided.placeholder}

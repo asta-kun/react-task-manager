@@ -30,6 +30,7 @@ const TaskListFilters = ({ updateState }: TaskListFiltersProps): ReactElement =>
   const [search, setSearch] = useState<string>('');
 
   useEffect(() => {
+    // send state to parent
     updateState({ duration, search });
   }, [duration, search]);
 

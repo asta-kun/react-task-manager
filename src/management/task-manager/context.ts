@@ -1,6 +1,8 @@
 import { createContext } from 'react';
 import { Task } from '../../request-type/tasks.d';
 
+/* definitions */
+
 export type TaskManagerContext = {
   create: () => void;
   changePosition: (taskId: string, source: number, destination: number) => void;
